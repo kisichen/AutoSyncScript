@@ -99,13 +99,8 @@ run_normal() {
 run_concurrent() {
     local p1=$1
     local p3=$3
-    if [[ ! $p3 ]]; then
-        echo -e "\n 缺少并发运行的环境变量参数"
-        exit 1
-    fi
-
     local envs=$(eval echo "\$${p3}")
-    local array=($(echo $envs | sed 's/&/ /g'))
+    local array=(${envs//&/})
     cd $dir_scripts
     define_program "$p1"
     log_dir="$dir_log/${p1%%.*}"
@@ -114,7 +109,7 @@ run_concurrent() {
     echo -e "\n各账号间已经在后台开始并发执行，前台不输入日志，日志直接写入文件中。\n"
     for i in "${!array[@]}"; do
         export ${p3}=${array[i]}
-        log_path="$log_dir/${log_time}_$((i+1)).log"
+        log_path="$log_dir/${log_time}_${user_num}.log"
         timeout $command_timeout_time $which_program $p1 &>$log_path &
     done
 }
@@ -138,7 +133,7 @@ main() {
     1)
         run_normal $1
         ;;
-    2|3)
+    2)
         case $2 in
         now)
             run_normal $1 $2
