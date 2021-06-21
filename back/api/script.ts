@@ -18,13 +18,9 @@ export default (app: Router) => {
         const fileList = fs.readdirSync(config.scriptPath, 'utf-8');
         res.send({
           code: 200,
-          data: fileList
-            .filter((x) => {
-              return !fs.lstatSync(config.scriptPath + x).isDirectory();
-            })
-            .map((x) => {
-              return { title: x, value: x, key: x };
-            }),
+          data: fileList.map((x) => {
+            return { title: x, value: x, key: x };
+          }),
         });
       } catch (e) {
         logger.error('🔥 error: %o', e);
